@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { View, Text, Button, Alert, Picker } from 'react-native';
-import { getTemasComQuantidadePerguntas } from '../database/dbTemas';
 
 export default function IniciarQuizScreen({ navigation }) {
   const [temas, setTemas] = useState([]);
