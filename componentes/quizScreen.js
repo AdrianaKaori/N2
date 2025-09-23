@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity} from 'react-native';
-import db from '../database/db';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { getDbConnection } from '../services/database';
 
 export default function QuizScreen({ route, navigation }) {
   const { temaId, quantidade } = route.params;
@@ -11,62 +11,71 @@ export default function QuizScreen({ route, navigation }) {
   const [alternativas, setAlternativas] = useState([]);
 
   useEffect(() => {
-    // Buscar perguntas aleatórias do tema
-    db.transaction(tx => {
-      tx.executeSql(
-        `SELECT perguntas.id, perguntas.pergunta, perguntas.resposta_correta
-         FROM perguntas WHERE tema_id = ? ORDER BY RANDOM() LIMIT ?`,
-        [temaId, quantidade],
-        (_, { rows }) => {
-          const arr = rows._array;
-          setPerguntas(arr);
-          if (arr.length > 0) {
-            carregarAlternativas(arr[0].id);
-          }
-        }
-      );
-    });
+    carregarPerguntas();
   }, []);
 
-  const carregarAlternativas = (perguntaId) => {
-    db.transaction(tx => {
-      tx.executeSql(
-        'SELECT alternativa, numero FROM alternativas WHERE pergunta_id = ? ORDER BY numero ASC',
-        [perguntaId],
-        (_, { rows }) => {
-          setAlternativas(rows._array);
-        }
-      );
-    });
+  const carregarPerguntas = async () => {
+    const db = await getDbConnection();
+
+    const result = await db.getAllAsync(
+      `SELECT perguntas.id, perguntas.pergunta, perguntas.resposta_correta
+       FROM perguntas 
+       WHERE tema_id = ? 
+       ORDER BY RANDOM() 
+       LIMIT ?`,
+      [temaId, quantidade]
+    );
+
+    setPerguntas(result);
+
+    if (result.length > 0) {
+      await carregarAlternativas(result[0].id);
+    }
+
+    await db.closeAsync();
   };
 
-  const responder = (numeroEscolhido) => {
+  const carregarAlternativas = async (perguntaId) => {
+    const db = await getDbConnection();
+
+    const result = await db.getAllAsync(
+      'SELECT alternativa, numero FROM alternativas WHERE pergunta_id = ? ORDER BY numero ASC',
+      [perguntaId]
+    );
+
+    setAlternativas(result);
+
+    await db.closeAsync();
+  };
+
+  const responder = async (numeroEscolhido) => {
     const novaResposta = [...respostas];
     novaResposta[indiceAtual] = numeroEscolhido;
     setRespostas(novaResposta);
 
     if (indiceAtual + 1 < perguntas.length) {
-      setIndiceAtual(indiceAtual + 1);
-      carregarAlternativas(perguntas[indiceAtual + 1].id);
+      const proximoIndice = indiceAtual + 1;
+      setIndiceAtual(proximoIndice);
+      await carregarAlternativas(perguntas[proximoIndice].id);
     } else {
       // Fim do quiz - navegar para resultados
       navigation.navigate('Resultado', {
         perguntas,
-        respostas: novaResposta
+        respostas: novaResposta,
       });
     }
   };
 
   if (perguntas.length === 0) {
     return (
-      <View style={{ flex:1, justifyContent:'center', alignItems:'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Carregando perguntas...</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex:1, padding: 20 }}>
+    <View style={{ flex: 1, padding: 20 }}>
       <Text style={{ fontSize: 18, marginBottom: 10 }}>
         Pergunta {indiceAtual + 1} de {perguntas.length}
       </Text>
@@ -83,7 +92,7 @@ export default function QuizScreen({ route, navigation }) {
             borderWidth: 1,
             borderColor: '#333',
             borderRadius: 8,
-            marginBottom: 10
+            marginBottom: 10,
           }}
         >
           <Text>{alt.alternativa}</Text>
