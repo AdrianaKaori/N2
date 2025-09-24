@@ -96,7 +96,6 @@ export default function CadastrarPerguntaScreen() {
 
     console.log("antes de inserir alternativassss")
     for (let i = 0; i < alternativas.length; i++) {
-      console.log(i)
       const sucesso = await addAlternativa(perguntaId, alternativas[i], i);
       if (!sucesso) {
         throw new Error(`Erro ao salvar a alternativa ${i + 1}`);
@@ -108,7 +107,7 @@ export default function CadastrarPerguntaScreen() {
     carregarPerguntas();
 
   } catch (error) {
-    console.error(error); // opcional: para debug
+    console.error(error);
     Alert.alert('Erro', error.message);
   }
 }
@@ -123,7 +122,7 @@ export default function CadastrarPerguntaScreen() {
     let vetor = pergunta.alternativas.map(a => a.alternativa);
 
     console.log(vetor);
-    
+
     setAlternativasEditadas(vetor);
   }
 
