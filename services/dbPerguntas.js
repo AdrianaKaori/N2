@@ -14,8 +14,9 @@ export async function addPergunta(pergunta, tema_id, resposta_correta) {
     [pergunta, tema_id, resposta_correta]
   );
   await db.closeAsync();
-  return result.changes === 1;
+  return result.lastID;  // retorna o id da pergunta inserida
 }
+
 
 export async function updatePergunta(id, pergunta, tema_id, resposta_correta) {
   const db = await getDbConnection();
