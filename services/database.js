@@ -1,5 +1,5 @@
 // db.js
-import * as SQLite from 'expo-sqlite/next';
+import * as SQLite from 'expo-sqlite';
 
 // Abrir conexão
 export async function getDbConnection() {

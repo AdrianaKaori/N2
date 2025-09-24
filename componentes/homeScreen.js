@@ -6,6 +6,8 @@ export default function HomeScreen({ navigation }) {
       <Button title="Cadastrar Tema" onPress={() => navigation.navigate('CadastrarTema')} />
       <Button title="Cadastrar Pergunta" onPress={() => navigation.navigate('CadastrarPergunta')} />
       <Button title="Iniciar Quiz" onPress={() => navigation.navigate('IniciarQuiz')} />
+      <Button title="Quiz" onPress={() => navigation.navigate('Quiz')} />
+      <Button title="Resultado" onPress={() => navigation.navigate('Resultado')} />    
     </View>
   );
 }
