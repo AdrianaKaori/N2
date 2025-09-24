@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, Text, TouchableOpacity, Image, FlatList } from 'react-native';
+import {
+  View,
+  TextInput,
+  Alert,
+  Text,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
+
 import { getTemas, addTema, updateTema, deleteTema } from '../services/dbTemas';
 
-import iconDelete from '../assets/delete.png'; 
+import iconDelete from '../assets/delete.png';
 import iconEdit from '../assets/edit.png';
 
 export default function CadastrarTemaScreen() {
@@ -11,7 +21,6 @@ export default function CadastrarTemaScreen() {
   const [editandoId, setEditandoId] = useState(null);
   const [nomeEditado, setNomeEditado] = useState('');
 
-  // Carrega temas do banco ao montar componente
   useEffect(() => {
     carregarTemas();
   }, []);
@@ -25,7 +34,6 @@ export default function CadastrarTemaScreen() {
     }
   }
 
-  // Salvar tema novo
   const salvarTema = async () => {
     if (!nomeTema.trim()) {
       Alert.alert('Erro', 'Digite o nome do tema');
@@ -42,7 +50,6 @@ export default function CadastrarTemaScreen() {
     }
   };
 
-  // Remover tema pelo id
   const removerElemento = async (id) => {
     const sucesso = await deleteTema(id);
     if (sucesso) {
@@ -53,13 +60,11 @@ export default function CadastrarTemaScreen() {
     }
   };
 
-  // Começar a editar: seta id e nome do tema no input
   const iniciarEdicao = (id, nome) => {
     setEditandoId(id);
     setNomeEditado(nome);
   };
 
-  // Salvar edição do tema
   const salvarEdicao = async () => {
     if (!nomeEditado.trim()) {
       Alert.alert('Erro', 'Digite o nome do tema');
@@ -77,48 +82,57 @@ export default function CadastrarTemaScreen() {
     }
   };
 
-  // Cancelar edição
   const cancelarEdicao = () => {
     setEditandoId(null);
     setNomeEditado('');
   };
 
   return (
-    <View style={{ padding: 20, flex: 1 }}>
+    <View style={styles.container}>
+      <Text style={styles.title}>Cadastro de Temas</Text>
+
       <TextInput
         placeholder="Nome do Tema"
         value={nomeTema}
         onChangeText={setNomeTema}
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+        style={styles.input}
+        placeholderTextColor="#555"
       />
 
-      <Button title="Salvar Tema" onPress={salvarTema} />
+      <TouchableOpacity style={styles.button} onPress={salvarTema}>
+        <Text style={styles.buttonText}>Salvar Tema</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={temas}
         keyExtractor={(item) => item.id.toString()}
         style={{ marginTop: 20 }}
         renderItem={({ item }) => (
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+          <View style={styles.temaItem}>
             {editandoId === item.id ? (
               <>
                 <TextInput
                   value={nomeEditado}
                   onChangeText={setNomeEditado}
-                  style={{ borderWidth: 1, flex: 1, padding: 5 }}
+                  style={styles.inputEdit}
+                  placeholder="Editar nome"
+                  placeholderTextColor="#555"
                 />
-                <Button title="Salvar" onPress={salvarEdicao} />
-                <Button title="Cancelar" onPress={cancelarEdicao} />
+                <TouchableOpacity onPress={salvarEdicao} style={styles.editBtn}>
+                  <Text style={styles.editBtnText}>Salvar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={cancelarEdicao} style={[styles.editBtn, { backgroundColor: '#ccc' }]}>
+                  <Text style={styles.editBtnText}>Cancelar</Text>
+                </TouchableOpacity>
               </>
             ) : (
               <>
-                <Text style={{ flex: 1 }}>{item.nome}</Text>
+                <Text style={styles.temaText}>{item.nome}</Text>
                 <TouchableOpacity onPress={() => iniciarEdicao(item.id, item.nome)}>
-                  <Image source={iconEdit} style={{ width: 20, height: 20, marginRight: 10 }} />
+                  <Image source={iconEdit} style={styles.icon} />
                 </TouchableOpacity>
-
                 <TouchableOpacity onPress={() => removerElemento(item.id)}>
-                  <Image source={iconDelete} style={{ width: 20, height: 20 }} />
+                  <Image source={iconDelete} style={styles.icon} />
                 </TouchableOpacity>
               </>
             )}
@@ -128,3 +142,76 @@ export default function CadastrarTemaScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FADBD8', // fundo rosa pastel
+    padding: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#5D6D7E',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: '#F5B7B1',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#4A4A4A',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  temaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FDEDEC',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  temaText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginHorizontal: 8,
+  },
+  inputEdit: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 6,
+    padding: 10,
+    fontSize: 15,
+    borderColor: '#ccc',
+    borderWidth: 1,
+  },
+  editBtn: {
+    backgroundColor: '#AED6F1',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    marginLeft: 5,
+  },
+  editBtnText: {
+    color: '#1A5276',
+    fontWeight: '600',
+  },
+});

@@ -5,16 +5,15 @@ export async function getAlternativas(pergunta_id = null) {
   const db = await getDbConnection();
   let query = 'SELECT * FROM alternativas';
   let params = [];
-
-  if (pergunta_id) {
-    query += ' WHERE pergunta_id=?';
-    params = [pergunta_id];
+  if (pergunta_id != null) {  // use != null para permitir 0?
+    query += ' WHERE pergunta_id = ?';
+    params = [ pergunta_id ];
   }
-
   const rows = await db.getAllAsync(query, params);
   await db.closeAsync();
   return rows;
 }
+
 
 export async function addAlternativa(pergunta_id, alternativa, numero) {
   const db = await getDbConnection();

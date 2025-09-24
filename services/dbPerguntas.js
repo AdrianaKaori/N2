@@ -13,10 +13,12 @@ export async function addPergunta(pergunta, tema_id, resposta_correta) {
     'INSERT INTO perguntas (pergunta, tema_id, resposta_correta) VALUES (?, ?, ?)',
     [pergunta, tema_id, resposta_correta]
   );
+  console.log('INSERT resultado:', result); // debug temporário
   await db.closeAsync();
-  return result.lastID;  // retorna o id da pergunta inserida
-}
 
+  // Dependendo da biblioteca, um desses pode funcionar
+  return result?.lastID || result?.insertId || null;
+}
 
 export async function updatePergunta(id, pergunta, tema_id, resposta_correta) {
   const db = await getDbConnection();

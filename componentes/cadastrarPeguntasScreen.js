@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Alert, FlatList, TouchableOpacity, Image } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Instale essa lib se não tiver: npm install @react-native-picker/picker
+import { Picker } from '@react-native-picker/picker'; // npm install @react-native-picker/picker
 
 import { getTemas } from '../services/dbTemas';
 import { getPerguntas, addPergunta, updatePergunta, deletePergunta } from '../services/dbPerguntas';
@@ -77,24 +77,35 @@ export default function CadastrarPerguntaScreen() {
   };
 
   async function salvarPergunta() {
-    if (!temaSelecionado || !pergunta.trim() || alternativas.some(a => !a.trim())) {
-      Alert.alert('Erro', 'Preencha todos os campos');
-      return;
+  if (!temaSelecionado || !pergunta.trim() || alternativas.some(a => !a.trim())) {
+    Alert.alert('Erro', 'Preencha todos os campos');
+    return;
+  }
+
+  try {
+    const perguntaId = await addPergunta(pergunta, temaSelecionado, respostaCorreta);
+
+    if (!perguntaId) {
+      throw new Error('Erro ao inserir pergunta no banco.');
     }
 
-    // Usar addPergunta que retorna o id da pergunta
-    const perguntaId = await addPergunta(pergunta, temaSelecionado, respostaCorreta);
-    if (perguntaId) {
-      for (let i = 0; i < alternativas.length; i++) {
-        await addAlternativa(perguntaId, alternativas[i], i);
+    for (let i = 0; i < alternativas.length; i++) {
+      const sucesso = await addAlternativa(perguntaId, alternativas[i], i);
+      if (!sucesso) {
+        throw new Error(`Erro ao salvar a alternativa ${i + 1}`);
       }
-      Alert.alert('Sucesso', 'Pergunta salva!');
-      resetForm();
-      carregarPerguntas();
-    } else {
-      Alert.alert('Erro', 'Erro ao salvar pergunta');
     }
+
+    Alert.alert('Sucesso', 'Pergunta salva!');
+    resetForm();
+    carregarPerguntas();
+
+  } catch (error) {
+    console.error(error); // opcional: para debug
+    Alert.alert('Erro', error.message);
   }
+}
+
 
   async function iniciarEdicao(pergunta) {
     setEditandoId(pergunta.id);
