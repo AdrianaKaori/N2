@@ -5,12 +5,6 @@ import { addTema } from '../services/dbTemas';
 export default function CadastrarTemaScreen({ navigation }) {
   const [nomeTema, setNomeTema] = useState('');
 
-  const salvarTema = () => {
-    if (!nomeTema.trim()) {
-      Alert.alert('Erro', 'Digite o nome do tema');
-      return;
-    }
-
     const salvarTema = async () => {
   if (!nomeTema.trim()) {
     Alert.alert('Erro', 'Digite o nome do tema');
@@ -38,4 +32,3 @@ export default function CadastrarTemaScreen({ navigation }) {
     </View>
   );
 };
-}
