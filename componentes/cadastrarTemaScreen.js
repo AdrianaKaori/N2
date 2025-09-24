@@ -1,14 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  View,
-  TextInput,
-  Alert,
-  Text,
-  TouchableOpacity,
-  Image,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
+import { View, TextInput, Alert, Text, TouchableOpacity, Image, FlatList, StyleSheet,} from 'react-native';
 
 import { getTemas, addTema, updateTema, deleteTema } from '../services/dbTemas';
 
