@@ -5,7 +5,7 @@ export async function getAlternativas(pergunta_id = null) {
   const db = await getDbConnection();
   let query = 'SELECT * FROM alternativas';
   let params = [];
-  if (pergunta_id != null) {  // use != null para permitir 0?
+  if (pergunta_id != null) {  
     query += ' WHERE pergunta_id = ?';
     params = [ pergunta_id ];
   }
@@ -20,7 +20,7 @@ export async function addAlternativa(pergunta_id, alternativa, numero) {
   const result = await db.runAsync(
     'INSERT INTO alternativas (pergunta_id, alternativa, numero) VALUES (?, ?, ?)',
     [pergunta_id, alternativa, numero]
-  );
+  );  
   await db.closeAsync();
   return result.changes === 1;
 }

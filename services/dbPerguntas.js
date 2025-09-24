@@ -6,18 +6,21 @@ export async function getPerguntas() {
   await db.closeAsync();
   return rows;
 }
-
+//tem algo de errado aqui e provavelmente esta conectado a tabela de alternativas
 export async function addPergunta(pergunta, tema_id, resposta_correta) {
   const db = await getDbConnection();
   const result = await db.runAsync(
     'INSERT INTO perguntas (pergunta, tema_id, resposta_correta) VALUES (?, ?, ?)',
     [pergunta, tema_id, resposta_correta]
-  );
-  console.log('INSERT resultado:', result); // debug temporário
+  );  
+  
+  let sqlconsulta = "select max(id) as id from perguntas"
+  const rows = await db.getAllAsync(sqlconsulta);
   await db.closeAsync();
 
+  console.log("id = " + rows[0].id);
   // Dependendo da biblioteca, um desses pode funcionar
-  return result?.lastID || result?.insertId || null;
+  return rows[0].id;
 }
 
 export async function updatePergunta(id, pergunta, tema_id, resposta_correta) {

@@ -28,9 +28,14 @@ export default function CadastrarPerguntaScreen() {
   const [respostaCorretaEditada, setRespostaCorretaEditada] = useState(0);
 
   useEffect(() => {
-    carregarTemas();
-    carregarPerguntas();
+    carregaDados();
   }, []);
+
+  async function carregaDados() {
+    await carregarTemas();
+    await carregarPerguntas();    
+  }
+
 
   async function carregarTemas() {
     try {
@@ -89,7 +94,9 @@ export default function CadastrarPerguntaScreen() {
       throw new Error('Erro ao inserir pergunta no banco.');
     }
 
+    console.log("antes de inserir alternativassss")
     for (let i = 0; i < alternativas.length; i++) {
+      console.log(i)
       const sucesso = await addAlternativa(perguntaId, alternativas[i], i);
       if (!sucesso) {
         throw new Error(`Erro ao salvar a alternativa ${i + 1}`);
@@ -112,7 +119,12 @@ export default function CadastrarPerguntaScreen() {
     setTemaEditado(pergunta.tema_id);
     setPerguntaEditada(pergunta.pergunta);
     setRespostaCorretaEditada(pergunta.resposta_correta);
-    setAlternativasEditadas(pergunta.alternativas.map(a => a.alternativa));
+
+    let vetor = pergunta.alternativas.map(a => a.alternativa);
+
+    console.log(vetor);
+    
+    setAlternativasEditadas(vetor);
   }
 
   async function salvarEdicao() {
