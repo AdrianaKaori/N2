@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, FlatList, TouchableOpacity, Image } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // npm install @react-native-picker/picker
+import { View, Text, TextInput, Button, Alert, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 import { getTemas } from '../services/dbTemas';
 import { getPerguntas, addPergunta, updatePergunta, deletePergunta } from '../services/dbPerguntas';
@@ -167,30 +167,34 @@ export default function CadastrarPerguntaScreen() {
   }
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 10 }}>
+    <View style={styles.container}>
+      <Text style={styles.title}>
         {editandoId ? 'Editar Pergunta' : 'Cadastrar Pergunta'}
       </Text>
 
-      <Text>Tema:</Text>
-      <Picker
-        selectedValue={editandoId ? temaEditado : temaSelecionado}
-        onValueChange={(itemValue) =>
-          editandoId ? setTemaEditado(itemValue) : setTemaSelecionado(itemValue)
-        }
-        style={{ marginVertical: 10 }}
-      >
-        <Picker.Item label="Selecione um tema" value={null} />
-        {temas.map((tema) => (
-          <Picker.Item key={tema.id} label={tema.nome} value={tema.id} />
-        ))}
-      </Picker>
+      <Text style={styles.label}>Tema:</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={editandoId ? temaEditado : temaSelecionado}
+          onValueChange={(itemValue) =>
+            editandoId ? setTemaEditado(itemValue) : setTemaSelecionado(itemValue)
+          }
+          style={styles.picker}
+          dropdownIconColor="#4A6351"
+        >
+          <Picker.Item label="Selecione um tema" value={null} />
+          {temas.map((tema) => (
+            <Picker.Item key={tema.id} label={tema.nome} value={tema.id} />
+          ))}
+        </Picker>
+      </View>
 
       <TextInput
         placeholder="Pergunta"
         value={editandoId ? perguntaEditada : pergunta}
         onChangeText={(text) => (editandoId ? setPerguntaEditada(text) : setPergunta(text))}
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+        style={styles.input}
+        placeholderTextColor="#7B9E7D"
       />
 
       {(editandoId ? alternativasEditadas : alternativas).map((alt, i) => (
@@ -209,58 +213,151 @@ export default function CadastrarPerguntaScreen() {
               setAlternativas(newAlts);
             }
           }}
-          style={{ borderWidth: 1, padding: 10, marginBottom: 5 }}
+          style={styles.input}
+          placeholderTextColor="#7B9E7D"
         />
       ))}
 
-      <Text>Alternativa correta:</Text>
-      <Picker
-        selectedValue={editandoId ? respostaCorretaEditada : respostaCorreta}
-        onValueChange={(itemValue) =>
-          editandoId ? setRespostaCorretaEditada(itemValue) : setRespostaCorreta(itemValue)
-        }
-        style={{ marginBottom: 10 }}
-      >
-        <Picker.Item label="1" value={0} />
-        <Picker.Item label="2" value={1} />
-        <Picker.Item label="3" value={2} />
-        <Picker.Item label="4" value={3} />
-      </Picker>
+      <Text style={styles.label}>Alternativa correta:</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={editandoId ? respostaCorretaEditada : respostaCorreta}
+          onValueChange={(itemValue) =>
+            editandoId ? setRespostaCorretaEditada(itemValue) : setRespostaCorreta(itemValue)
+          }
+          style={styles.picker}
+          dropdownIconColor="#4A6351"
+        >
+          <Picker.Item label="1" value={0} />
+          <Picker.Item label="2" value={1} />
+          <Picker.Item label="3" value={2} />
+          <Picker.Item label="4" value={3} />
+        </Picker>
+      </View>
 
       {editandoId ? (
-        <>
-          <Button title="Salvar Alterações" onPress={salvarEdicao} />
-          <Button title="Cancelar" onPress={resetEditForm} color="gray" />
-        </>
+        <View style={styles.buttonsRow}>
+          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={salvarEdicao}>
+            <Text style={styles.buttonText}>Salvar Alterações</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={resetEditForm}>
+            <Text style={styles.buttonText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
-        <Button title="Salvar Pergunta" onPress={salvarPergunta} />
+        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={salvarPergunta}>
+          <Text style={styles.buttonText}>Salvar Pergunta</Text>
+        </TouchableOpacity>
       )}
 
-      <Text style={{ marginTop: 20, fontWeight: 'bold', fontSize: 18 }}>Perguntas Cadastradas:</Text>
+      <Text style={styles.subTitle}>Perguntas Cadastradas:</Text>
       <FlatList
         data={perguntas}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginVertical: 5,
-              borderBottomWidth: 1,
-              borderColor: '#ccc',
-              paddingBottom: 5,
-            }}
-          >
-            <Text style={{ flex: 1 }}>{item.pergunta}</Text>
-            <TouchableOpacity onPress={() => iniciarEdicao(item)} style={{ marginRight: 10 }}>
-              <Image source={iconEdit} style={{ width: 20, height: 20 }} />
+          <View style={styles.perguntaItem}>
+            <Text style={styles.perguntaText}>{item.pergunta}</Text>
+            <TouchableOpacity onPress={() => iniciarEdicao(item)} style={styles.iconBtn}>
+              <Image source={iconEdit} style={styles.icon} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => removerPergunta(item.id)}>
-              <Image source={iconDelete} style={{ width: 20, height: 20 }} />
+            <TouchableOpacity onPress={() => removerPergunta(item.id)} style={styles.iconBtn}>
+              <Image source={iconDelete} style={styles.icon} />
             </TouchableOpacity>
           </View>
         )}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#D5F5E3',  
+    padding: 20,
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 22,
+    color: '#2E5137', 
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  label: {
+    fontSize: 16,
+    color: '#3C6E47',
+    marginBottom: 5,
+    fontWeight: '600',
+  },
+  input: {
+    backgroundColor: '#EFF9F3',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#A3D9B1',
+    padding: 12,
+    marginBottom: 10,
+    fontSize: 16,
+    color: '#2E5137',
+  },
+  pickerWrapper: {
+    backgroundColor: '#EFF9F3',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#A3D9B1',
+    marginBottom: 15,
+  },
+  picker: {
+    color: '#2E5137',
+  },
+  button: {
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  saveButton: {
+    backgroundColor: '#7BB661', 
+  },
+  cancelButton: {
+    backgroundColor: '#A9A9A9',
+  },
+  buttonText: {
+    color: '#F0F6F0',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  subTitle: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginTop: 25,
+    marginBottom: 10,
+    color: '#2E5137',
+  },
+  perguntaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#BCE5B5',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 8,
+  },
+  perguntaText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#2E5137',
+  },
+  iconBtn: {
+    padding: 5,
+    marginLeft: 10,
+  },
+  icon: {
+    width: 22,
+    height: 22,
+    tintColor: '#2E5137',
+  },
+});

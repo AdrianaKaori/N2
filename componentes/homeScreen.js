@@ -15,21 +15,23 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.buttonText}>Iniciar Quiz</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, styles.btnQuiz2]} onPress={() => navigation.navigate('Quiz')}>
+      
+    </View>
+  );
+}
+
+/*<TouchableOpacity style={[styles.button, styles.btnQuiz2]} onPress={() => navigation.navigate('Quiz')}>
         <Text style={styles.buttonText}>Quiz</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, styles.btnResultado]} onPress={() => navigation.navigate('Resultado')}>
         <Text style={styles.buttonText}>Resultado</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
+      </TouchableOpacity>*/
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F1', // fundo bem claro
+    backgroundColor: '#FFF9F1', 
     padding: 20,
     justifyContent: 'center',
   },
@@ -45,18 +47,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   btnTema: {
-    backgroundColor: '#FADBD8', // rosa pastel
+    backgroundColor: '#FADBD8', 
   },
   btnPergunta: {
-    backgroundColor: '#D5F5E3', // verde claro pastel
+    backgroundColor: '#D5F5E3', 
   },
   btnQuiz: {
-    backgroundColor: '#FCF3CF', // amarelo suave
+    backgroundColor: '#FCF3CF', 
   },
-  btnQuiz2: {
-    backgroundColor: '#D6EAF8', // azul claro
-  },
-  btnResultado: {
-    backgroundColor: '#E8DAEF', // lilás claro
-  },
+  //btnQuiz2: {
+    //backgroundColor: '#D6EAF8', 
+  //},
+  //btnResultado: {
+  //  backgroundColor: '#E8DAEF', 
+  //},
 });

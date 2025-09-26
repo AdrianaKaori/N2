@@ -137,7 +137,7 @@ export default function CadastrarTemaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FADBD8', // fundo rosa pastel
+    backgroundColor: '#FADBD8',
     padding: 20,
   },
   title: {

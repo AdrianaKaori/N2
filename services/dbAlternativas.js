@@ -1,4 +1,3 @@
-// alternativas.js
 import { getDbConnection } from './database';
 
 export async function getAlternativas(pergunta_id = null) {
