@@ -6,7 +6,7 @@ export async function getPerguntas() {
   await db.closeAsync();
   return rows;
 }
-//tem algo de errado aqui e provavelmente esta conectado a tabela de alternativas
+
 export async function addPergunta(pergunta, tema_id, resposta_correta) {
   const db = await getDbConnection();
   const result = await db.runAsync(
