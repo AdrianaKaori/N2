@@ -14,19 +14,9 @@ export default function HomeScreen({ navigation }) {
       <TouchableOpacity style={[styles.button, styles.btnQuiz]} onPress={() => navigation.navigate('IniciarQuiz')}>
         <Text style={styles.buttonText}>Iniciar Quiz</Text>
       </TouchableOpacity>
-
-      
     </View>
   );
 }
-
-/*<TouchableOpacity style={[styles.button, styles.btnQuiz2]} onPress={() => navigation.navigate('Quiz')}>
-        <Text style={styles.buttonText}>Quiz</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, styles.btnResultado]} onPress={() => navigation.navigate('Resultado')}>
-        <Text style={styles.buttonText}>Resultado</Text>
-      </TouchableOpacity>*/
 
 const styles = StyleSheet.create({
   container: {
@@ -55,10 +45,4 @@ const styles = StyleSheet.create({
   btnQuiz: {
     backgroundColor: '#FCF3CF', 
   },
-  //btnQuiz2: {
-    //backgroundColor: '#D6EAF8', 
-  //},
-  //btnResultado: {
-  //  backgroundColor: '#E8DAEF', 
-  //},
 });

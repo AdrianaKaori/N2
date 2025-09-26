@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Alert, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 import { getTemas } from '../services/dbTemas';

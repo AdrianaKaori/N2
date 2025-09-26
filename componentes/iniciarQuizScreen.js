@@ -123,7 +123,6 @@ export default function IniciarQuizScreen({ navigation }) {
   );
 }
 
-// 🎨 Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
