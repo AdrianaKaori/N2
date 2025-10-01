@@ -40,7 +40,7 @@ export default function CadastrarPerguntaScreen() {
   // Carrega temas e perguntas
   async function carregaDados() {
     await carregarTemas();
-    await carregarPerguntas();    
+    await carregarPerguntas();
   }
 
   // Busca os temas no banco de dados
@@ -103,26 +103,24 @@ export default function CadastrarPerguntaScreen() {
     // Adiciona pergunta e obtém o ID
     const perguntaId = await addPergunta(pergunta, temaSelecionado, respostaCorreta);
 
-    if (!perguntaId) {
-      throw new Error('Erro ao inserir pergunta no banco.');
-    }
-
+      if (!perguntaId) {
+        throw new Error('Erro ao inserir pergunta no banco.');
+      }
     // Adiciona as alternativa
-    console.log("antes de inserir alternativassss")
     for (let i = 0; i < alternativas.length; i++) {
       const sucesso = await addAlternativa(perguntaId, alternativas[i], i);
       if (!sucesso) {
         throw new Error(`Erro ao salvar a alternativa ${i + 1}`);
       }
-    }
 
     Alert.alert('Sucesso', 'Pergunta salva!');
     resetForm();
     carregarPerguntas(); // Recarrega a lista de perguntas
 
-  } catch (error) {
-    console.error(error);
-    Alert.alert('Erro', error.message);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', error.message);
+    }
   }
 }
 
@@ -139,49 +137,79 @@ export default function CadastrarPerguntaScreen() {
     console.log(vetor);
 
     setAlternativasEditadas(vetor);
+
+  }
+
+  function confirmaEdicao() {
+
+    Alert.alert("Aviso", "Deseja mesmo editar a pergunta?", [
+      { text: "Sim", onPress: () => salvarEdicao(true) },
+      { text: "Não", onPress: () => salvarEdicao(false) }
+    ]);
+
   }
 
   // Salva as alterações feitas na pergunta em edição
-  async function salvarEdicao() {
+  async function salvarEdicao(isConfirmed) {
     if (!temaEditado || !perguntaEditada.trim() || alternativasEditadas.some(a => !a.trim())) {
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
 
-    const sucesso = await updatePergunta(editandoId, perguntaEditada, temaEditado, respostaCorretaEditada);
-    if (sucesso) {
-      // Apaga alternativas antigas
-      const altAntigas = await getAlternativas(editandoId);
-      for (const alt of altAntigas) {
-        await deleteAlternativa(alt.id);
-      }
-      // Adiciona alternativas novas
-      for (let i = 0; i < alternativasEditadas.length; i++) {
-        await addAlternativa(editandoId, alternativasEditadas[i], i);
-      }
+    if (isConfirmed) {
 
-      Alert.alert('Sucesso', 'Pergunta atualizada!');
-      resetEditForm();
-      carregarPerguntas();
+      const sucesso = await updatePergunta(editandoId, perguntaEditada, temaEditado, respostaCorretaEditada);
+      if (sucesso) {
+        // Apaga alternativas antigas
+        const altAntigas = await getAlternativas(editandoId);
+        for (const alt of altAntigas) {
+          await deleteAlternativa(alt.id);
+        }
+        // Adiciona alternativas novas
+        for (let i = 0; i < alternativasEditadas.length; i++) {
+          await addAlternativa(editandoId, alternativasEditadas[i], i);
+        }
+
+        Alert.alert('Sucesso', 'Pergunta atualizada!');
+        resetEditForm();
+        carregarPerguntas();
+      } else {
+        Alert.alert('Erro', 'Erro ao atualizar pergunta');
+      }
     } else {
-      Alert.alert('Erro', 'Erro ao atualizar pergunta');
+      Alert.alert('Cancelado', 'Pergunta não atualizada');
     }
+
   }
 
-  // Remove uma pergunta e suas alternativas
-  async function removerPergunta(id) {
+  function confirmaExclusao(id) {
+
+    Alert.alert("Aviso", "Deseja mesmo remover a pergunta?", [
+      { text: "Sim", onPress: () => removerPergunta(id, true) },
+      { text: "Não", onPress: () => removerPergunta(id, false) }
+    ]);
+
+  }
+
+  async function removerPergunta(id, isConfirmed) {
+
+    if (isConfirmed) {
     const sucesso = await deletePergunta(id);
     if (sucesso) {
       // Remove as alternativas relacionadas
       const alt = await getAlternativas(id);
       for (const a of alt) {
         await deleteAlternativa(a.id);
+        }
+        Alert.alert('Sucesso', 'Pergunta removida!');
+        carregarPerguntas();
+      } else {
+        Alert.alert('Erro', 'Erro ao remover pergunta');
       }
-      Alert.alert('Sucesso', 'Pergunta removida!');
-      carregarPerguntas();
     } else {
-      Alert.alert('Erro', 'Erro ao remover pergunta');
+      Alert.alert('Cancelado', 'Pergunta não removida');
     }
+
   }
 
   return (
@@ -255,7 +283,7 @@ export default function CadastrarPerguntaScreen() {
 
       {editandoId ? (
         <View style={styles.buttonsRow}>
-          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={salvarEdicao}>
+          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={confirmaEdicao}>
             <Text style={styles.buttonText}>Salvar Alterações</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={resetEditForm}>
@@ -278,7 +306,7 @@ export default function CadastrarPerguntaScreen() {
             <TouchableOpacity onPress={() => iniciarEdicao(item)} style={styles.iconBtn}>
               <Image source={iconEdit} style={styles.icon} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => removerPergunta(item.id)} style={styles.iconBtn}>
+            <TouchableOpacity onPress={() => confirmaExclusao(item.id)} style={styles.iconBtn}>
               <Image source={iconDelete} style={styles.icon} />
             </TouchableOpacity>
           </View>
@@ -292,13 +320,13 @@ export default function CadastrarPerguntaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#D5F5E3',  
+    backgroundColor: '#D5F5E3',
     padding: 20,
   },
   title: {
     fontWeight: 'bold',
     fontSize: 22,
-    color: '#2E5137', 
+    color: '#2E5137',
     marginBottom: 15,
     textAlign: 'center',
   },
@@ -335,7 +363,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saveButton: {
-    backgroundColor: '#7BB661', 
+    backgroundColor: '#7BB661',
   },
   cancelButton: {
     backgroundColor: '#A9A9A9',
