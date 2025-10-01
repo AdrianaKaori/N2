@@ -8,34 +8,46 @@ Aplicativo de **quiz educacional** desenvolvido em **React Native**, com banco d
 
 ---
 
+## 🧪 Tecnologias Utilizadas
+
+| Tecnologia           | Função                             |
+|----------------------|-------------------------------------|
+| React Native         | Interface e lógica mobile           |
+| Expo SQLite          | Banco de dados local                |
+| React Navigation     | Navegação entre telas               |
+| JavaScript (ES6)     | Lógica da aplicação                 |
+| Async/Await          | Acesso assíncrono ao banco          |
+
+---
+
 ## 🧩 Funcionalidades
 
 ✅ Cadastro de temas  
-✅ Cadastro de perguntas e alternativas  
+✅ Cadastro de perguntas com 4 alternativas e a resposta correta  
 ✅ Edição e exclusão de perguntas/temas  
 ✅ Seleção de tema para o quiz  
 ✅ Execução de quiz com perguntas aleatórias  
 ✅ Cálculo da pontuação e exibição do resultado  
-🔜 Exportação de resultados
+✅ Interface amigável e responsiva
 
 ---
 
 ## 🧱 Estrutura do Projeto
 
 N2/<br>
-├── assets/ # Arquivos estáticos (imagens) <br>
+├── assets/ → Ícones (editar, deletar) <br>
 ├── componentes/— telas (screens) do aplicativo<br>
-|    |— homeScreen.js<br>
-|    |— cadastrarTemaScreen.js<br>
-|    |— cadastrarPeguntasScreen.js<br>
-|    |— iniciarQuizScreen.js<br>
-|    |— quizScreen.js<br>
-|    |— resultadoScreen.js<br>
+|    |— homeScreen.js → Tela inicial com navegação<br>
+|    |— cadastrarTemaScreen.js → Cadastro/edição de temas<br>
+|    |— cadastrarPeguntasScreen.js → Cadastro/edição de perguntas + alternativas<br>
+|    |— iniciarQuizScreen.js → Escolha de tema e quantidade para iniciar quiz<br>
+|    |— quizScreen.js → Tela do quiz em execução<br>
+|    |— resultadoScreen.js → Exibição do resultado final<br>
 ├── services/ — lógica de acesso ao banco de dados (SQLite)<br>
-|    |— database.js<br>
-|    |— dbTemas.js<br>
-|    |— dbPerguntas.js<br>
-|    |— dbAlternativas.js<br>
+|    |— database.js → Conexão com SQLite + criação das tabelas<br>
+|    |— dbTemas.js → CRUD de temas <br>
+|    |— dbPerguntas.js → CRUD de perguntas<br>
+|    |— dbAlternativas.js → CRUD de alternativas<br>
 ├── App.js — ponto de entrada e configuração de navegação<br>
 ├── app.json # Configuração do app<br>
 ├── index.js # Ponto de entrada da aplicação<br>
@@ -64,27 +76,40 @@ npx expo start
 ---
 
 ## 💾 Estrutura do Banco de Dados (SQLite)
-Tabelas:
+Banco local `quiz.db` criado com 3 tabelas principais:
 
-temas
-* id (INTEGER, PK)
-* nome (TEXT)
+### 🔹 Tabela `temas`
+| Campo | Tipo     | Descrição                |
+|-------|----------|--------------------------|
+| id    | INTEGER  | Chave primária (auto)    |
+| nome  | TEXT     | Nome do tema             |
 
-perguntas
-* id (INTEGER, PK)
-* pergunta (TEXT)
-* id_tema (INTEGER, FK)
+### 🔹 Tabela `perguntas`
+| Campo           | Tipo     | Descrição                          |
+|------------------|----------|-------------------------------------|
+| id               | INTEGER  | Chave primária                     |
+| pergunta         | TEXT     | Enunciado da pergunta              |
+| tema_id          | INTEGER  | Chave estrangeira para `temas`     |
+| resposta_correta | INTEGER  | Número da alternativa correta      |
 
-alternativas
-* id (INTEGER, PK)
-* id_pergunta (INTEGER, FK)
-* alternativa (TEXT)
-* correta (BOOLEAN)
+### 🔹 Tabela `alternativas`
+| Campo        | Tipo     | Descrição                          |
+|--------------|----------|-------------------------------------|
+| id           | INTEGER  | Chave primária                     |
+| pergunta_id  | INTEGER  | Chave estrangeira para `perguntas` |
+| alternativa  | TEXT     | Texto da alternativa               |
+| numero       | INTEGER  | Número identificador (1 a N)       |
 
-Relacionamentos:
+#### Relacionamentos:
 * Um tema possui várias perguntas
 * Uma pergunta possui várias alternativas
 * Apenas uma alternativa por pergunta deve ser marcada como correta
+
+### 🔄 CRUDs de cada entidade:
+* get() — lista todos
+* add(nome) — adiciona
+* update(id, nome) — edita
+* delete(id) — remove
 
 ---
 
