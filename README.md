@@ -17,6 +17,7 @@ Aplicativo de **quiz educacional** desenvolvido em **React Native**, com banco d
 | React Navigation     | Navegação entre telas               |
 | JavaScript (ES6)     | Lógica da aplicação                 |
 | Async/Await          | Acesso assíncrono ao banco          |
+| @react-native-picker/picker        | Seleção          |
 
 ---
 
