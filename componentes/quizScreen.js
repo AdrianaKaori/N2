@@ -3,31 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { getDbConnection } from '../services/database';
 
 export default function QuizScreen({ route, navigation }) {
-  const { temaId, quantidade, tempoJogo } = route.params;
+  const { temaId, quantidade } = route.params;
 
   const [perguntas, setPerguntas] = useState([]);
   const [indiceAtual, setIndiceAtual] = useState(0);
   const [respostas, setRespostas] = useState([]);
   const [alternativas, setAlternativas] = useState([]);
-  const [timerCount, setTimerCount] = useState(tempoJogo)
-
-  useEffect(() => {
-    let interval = setInterval(() => {
-      setTimerCount(lastTimerCount => {
-        if (lastTimerCount == 0) {
-          navigation.navigate('Resultado', {
-            perguntas,
-            respostas: ['Tempo Esgotado'],
-          });
-        } else {
-          lastTimerCount <= 1 && clearInterval(interval)
-          return lastTimerCount - 1
-        }
-      })
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, []);
 
   useEffect(() => {
     carregarPerguntas();
@@ -103,7 +84,6 @@ export default function QuizScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.timer}>{timerCount}</Text>
       <Text style={styles.questionCount}>
         Pergunta {indiceAtual + 1} de {perguntas.length}
       </Text>
@@ -163,10 +143,5 @@ const styles = StyleSheet.create({
   optionText: {
     color: '#1B2631',
     fontSize: 16,
-  },
-  timer: {
-    alignSelf: 'center',
-    color: '#1B2631',
-    fontSize: 40,
   },
 });
