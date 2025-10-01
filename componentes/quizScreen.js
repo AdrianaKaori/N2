@@ -3,21 +3,26 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { getDbConnection } from '../services/database';
 
 export default function QuizScreen({ route, navigation }) {
+  // Recebe os parâmetros passados pela navegação: o tema selecionado e a quantidade de perguntas
   const { temaId, quantidade } = route.params;
-
+  // Armazena a lista de perguntas carregadas do banco
   const [perguntas, setPerguntas] = useState([]);
+  // Índice da pergunta atual no quiz
   const [indiceAtual, setIndiceAtual] = useState(0);
+  // Armazena as respostas selecionadas pelo usuário (por número da alternativa)
   const [respostas, setRespostas] = useState([]);
+  // Armazena as alternativas da pergunta atual
   const [alternativas, setAlternativas] = useState([]);
 
   useEffect(() => {
-    carregarPerguntas();
+    carregarPerguntas(); // Carrega as perguntas quando o componente monta
   }, []);
 
   const carregarPerguntas = async () => {
     try {
       const db = await getDbConnection();
 
+      // Busca aleatória das perguntas do tema escolhido, limitando pela quantidade definida
       const result = await db.getAllAsync(
         `SELECT perguntas.id, perguntas.pergunta, perguntas.resposta_correta
          FROM perguntas 
@@ -30,10 +35,10 @@ export default function QuizScreen({ route, navigation }) {
       await db.closeAsync();
 
       if (result && result.length > 0) {
-        setPerguntas(result);
-        await carregarAlternativas(result[0].id);
+        setPerguntas(result);// Armazena as perguntas no estado
+        await carregarAlternativas(result[0].id);// Carrega as alternativas da primeira pergunta
       } else {
-        setPerguntas([]);
+        setPerguntas([]);// Nenhuma pergunta encontrada
       }
     } catch (error) {
       console.error('Erro ao carregar perguntas:', error);
@@ -50,23 +55,25 @@ export default function QuizScreen({ route, navigation }) {
       );
 
       await db.closeAsync();
-      setAlternativas(result || []);
+      setAlternativas(result || []);// Armazena as alternativas no estado
     } catch (error) {
       console.error('Erro ao carregar alternativas:', error);
     }
   };
 
   const responder = async (numeroEscolhido) => {
-    const novaResposta = [...respostas];
-    novaResposta[indiceAtual] = numeroEscolhido;
-    setRespostas(novaResposta);
+    const novaResposta = [...respostas];// Copia o array de respostas anteriores
+    novaResposta[indiceAtual] = numeroEscolhido; // Salva a resposta da pergunta atual
+    setRespostas(novaResposta);// Atualiza o estado
 
+    // Se houver mais perguntas, avança para a próxima
     if (indiceAtual + 1 < perguntas.length) {
       const proximoIndice = indiceAtual + 1;
-      setIndiceAtual(proximoIndice);
-      await carregarAlternativas(perguntas[proximoIndice].id);
+      setIndiceAtual(proximoIndice);// Avança o índice da pergunta
+      await carregarAlternativas(perguntas[proximoIndice].id);// Carrega alternativas da nova pergunta
     } else {
       // Fim do quiz
+      // Se for a última pergunta, navega para a tela de resultado
       navigation.navigate('Resultado', {
         perguntas,
         respostas: novaResposta,

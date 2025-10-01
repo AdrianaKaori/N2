@@ -2,20 +2,25 @@ import { useState, useEffect } from 'react';
 import { View, Text, TextInput, Alert, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
+// Importação de serviços para lidar com banco de dados (Temas, Perguntas, Alternativas)
 import { getTemas } from '../services/dbTemas';
 import { getPerguntas, addPergunta, updatePergunta, deletePergunta } from '../services/dbPerguntas';
 import { getAlternativas, addAlternativa, deleteAlternativa } from '../services/dbAlternativas';
 
+// Ícones
 import iconDelete from '../assets/delete.png';
 import iconEdit from '../assets/edit.png';
 
+// Componente principal da tela
 export default function CadastrarPerguntaScreen() {
+  // Estados para cadastro de pergunta
   const [temas, setTemas] = useState([]);
   const [temaSelecionado, setTemaSelecionado] = useState(null);
   const [pergunta, setPergunta] = useState('');
   const [alternativas, setAlternativas] = useState(['', '', '', '']);
   const [respostaCorreta, setRespostaCorreta] = useState(0);
-
+  
+  // Lista de perguntas existentes
   const [perguntas, setPerguntas] = useState([]);
 
   // Para edição:
@@ -27,16 +32,18 @@ export default function CadastrarPerguntaScreen() {
   const [alternativasEditadas, setAlternativasEditadas] = useState(['', '', '', '']);
   const [respostaCorretaEditada, setRespostaCorretaEditada] = useState(0);
 
+  // Carregamento inicial de dados ao abrir a tela
   useEffect(() => {
     carregaDados();
   }, []);
 
+  // Carrega temas e perguntas
   async function carregaDados() {
     await carregarTemas();
     await carregarPerguntas();
   }
 
-
+  // Busca os temas no banco de dados
   async function carregarTemas() {
     try {
       const dados = await getTemas();
@@ -46,6 +53,7 @@ export default function CadastrarPerguntaScreen() {
     }
   }
 
+  // Busca perguntas e suas alternativas
   async function carregarPerguntas() {
     try {
       const dados = await getPerguntas();
@@ -66,6 +74,7 @@ export default function CadastrarPerguntaScreen() {
     }
   }
 
+  // Limpa os campos de cadastro
   const resetForm = () => {
     setTemaSelecionado(null);
     setPergunta('');
@@ -73,6 +82,7 @@ export default function CadastrarPerguntaScreen() {
     setRespostaCorreta(0);
   };
 
+  // Limpa os campos de edição
   const resetEditForm = () => {
     setEditandoId(null);
     setTemaEditado(null);
@@ -81,43 +91,47 @@ export default function CadastrarPerguntaScreen() {
     setRespostaCorretaEditada(0);
   };
 
+  // Função para salvar nova pergunta
   async function salvarPergunta() {
-    if (!temaSelecionado || !pergunta.trim() || alternativas.some(a => !a.trim())) {
-      Alert.alert('Erro', 'Preencha todos os campos');
-      return;
-    }
+  // Validação  
+  if (!temaSelecionado || !pergunta.trim() || alternativas.some(a => !a.trim())) {
+    Alert.alert('Erro', 'Preencha todos os campos');
+    return;
+  }
 
-    try {
-      const perguntaId = await addPergunta(pergunta, temaSelecionado, respostaCorreta);
+  try {
+    // Adiciona pergunta e obtém o ID
+    const perguntaId = await addPergunta(pergunta, temaSelecionado, respostaCorreta);
 
       if (!perguntaId) {
         throw new Error('Erro ao inserir pergunta no banco.');
       }
-
-      console.log("antes de inserir alternativassss")
-      for (let i = 0; i < alternativas.length; i++) {
-        const sucesso = await addAlternativa(perguntaId, alternativas[i], i);
-        if (!sucesso) {
-          throw new Error(`Erro ao salvar a alternativa ${i + 1}`);
-        }
+    // Adiciona as alternativa
+    for (let i = 0; i < alternativas.length; i++) {
+      const sucesso = await addAlternativa(perguntaId, alternativas[i], i);
+      if (!sucesso) {
+        throw new Error(`Erro ao salvar a alternativa ${i + 1}`);
       }
 
-      Alert.alert('Sucesso', 'Pergunta salva!');
-      resetForm();
-      carregarPerguntas();
+    Alert.alert('Sucesso', 'Pergunta salva!');
+    resetForm();
+    carregarPerguntas(); // Recarrega a lista de perguntas
 
     } catch (error) {
       console.error(error);
       Alert.alert('Erro', error.message);
     }
   }
+}
 
+  // Inicia a edição de uma pergunta existente
   async function iniciarEdicao(pergunta) {
     setEditandoId(pergunta.id);
     setTemaEditado(pergunta.tema_id);
     setPerguntaEditada(pergunta.pergunta);
     setRespostaCorretaEditada(pergunta.resposta_correta);
 
+    // Extrai alternativas
     let vetor = pergunta.alternativas.map(a => a.alternativa);
 
     console.log(vetor);
@@ -135,6 +149,7 @@ export default function CadastrarPerguntaScreen() {
 
   }
 
+  // Salva as alterações feitas na pergunta em edição
   async function salvarEdicao(isConfirmed) {
     if (!temaEditado || !perguntaEditada.trim() || alternativasEditadas.some(a => !a.trim())) {
       Alert.alert('Erro', 'Preencha todos os campos');
@@ -179,18 +194,18 @@ export default function CadastrarPerguntaScreen() {
   async function removerPergunta(id, isConfirmed) {
 
     if (isConfirmed) {
-      const sucesso = await deletePergunta(id);
-      if (sucesso) {
-        const alt = await getAlternativas(id);
-        for (const a of alt) {
-          await deleteAlternativa(a.id);
+    const sucesso = await deletePergunta(id);
+    if (sucesso) {
+      // Remove as alternativas relacionadas
+      const alt = await getAlternativas(id);
+      for (const a of alt) {
+        await deleteAlternativa(a.id);
         }
         Alert.alert('Sucesso', 'Pergunta removida!');
         carregarPerguntas();
       } else {
         Alert.alert('Erro', 'Erro ao remover pergunta');
       }
-
     } else {
       Alert.alert('Cancelado', 'Pergunta não removida');
     }

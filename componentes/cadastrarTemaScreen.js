@@ -1,41 +1,49 @@
 import { useState, useEffect } from 'react';
 import { View, TextInput, Alert, Text, TouchableOpacity, Image, FlatList, StyleSheet, } from 'react-native';
 
+// Importa funções para manipular os temas no banco de dados
 import { getTemas, addTema, updateTema, deleteTema } from '../services/dbTemas';
 
 import iconDelete from '../assets/delete.png';
 import iconEdit from '../assets/edit.png';
 
+// Componente principal da tela de cadastro de temas
 export default function CadastrarTemaScreen() {
+  // Estado para o nome do novo tema a ser criado
   const [nomeTema, setNomeTema] = useState('');
+  // Lista de temas carregados do banco
   const [temas, setTemas] = useState([]);
-  const [editandoId, setEditandoId] = useState(null);
-  const [nomeEditado, setNomeEditado] = useState('');
+  // Estados para edição de tema
+  const [editandoId, setEditandoId] = useState(null);// armazena o ID do tema que está sendo editado
+  const [nomeEditado, setNomeEditado] = useState('');// novo nome digitado na edição
 
+  // useEffect roda quando o componente é montado
   useEffect(() => {
-    carregarTemas();
+    carregarTemas();// carrega a lista de temas
   }, []);
 
+  // Função que busca os temas no banco de dados
   async function carregarTemas() {
     try {
-      const dados = await getTemas();
-      setTemas(dados);
+      const dados = await getTemas();// busca temas
+      setTemas(dados);// atualiza o estado
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar os temas');
     }
   }
 
+  // Função para salvar um novo tema
   const salvarTema = async () => {
     if (!nomeTema.trim()) {
       Alert.alert('Erro', 'Digite o nome do tema');
       return;
     }
 
-    const sucesso = await addTema(nomeTema);
+    const sucesso = await addTema(nomeTema);// adiciona no banco
     if (sucesso) {
       Alert.alert('Sucesso', 'Tema salvo com sucesso!');
-      setNomeTema('');
-      carregarTemas();
+      setNomeTema('');// limpa o campo
+      carregarTemas();// recarrega a lista
     } else {
       Alert.alert('Erro', 'Erro ao salvar tema');
     }
@@ -50,12 +58,14 @@ export default function CadastrarTemaScreen() {
 
   }
 
+  
+  // Função para remover um tema
   const removerElemento = async (id, isConfirmed) => {
     if (isConfirmed) {
       const sucesso = await deleteTema(id);
       if (sucesso) {
         Alert.alert('Sucesso', 'Tema removido');
-        carregarTemas();
+        carregarTemas();// atualiza lista
       } else {
         Alert.alert('Erro', 'Erro ao remover tema');
       }
@@ -64,6 +74,7 @@ export default function CadastrarTemaScreen() {
     }
   };
 
+  // Preenche os estados com os dados do tema selecionado para edição
   const iniciarEdicao = (id, nome) => {
     setEditandoId(id);
     setNomeEditado(nome);
@@ -78,6 +89,8 @@ export default function CadastrarTemaScreen() {
 
   }
 
+  
+  // Salva as alterações feitas no tema
   const salvarEdicao = async (isConfirmed) => {
     if (!nomeEditado.trim()) {
       Alert.alert('Erro', 'Digite o nome do tema');
@@ -85,12 +98,12 @@ export default function CadastrarTemaScreen() {
     }
 
     if (isConfirmed) {
-      const sucesso = await updateTema(editandoId, nomeEditado);
+      const sucesso = await updateTema(editandoId, nomeEditado); // atualiza no banco
       if (sucesso) {
         Alert.alert('Sucesso', 'Tema atualizado');
-        setEditandoId(null);
+        setEditandoId(null); // sai do modo edição
         setNomeEditado('');
-        carregarTemas();
+        carregarTemas(); // recarrega lista
       } else {
         Alert.alert('Erro', 'Erro ao atualizar tema');
       }
@@ -99,6 +112,7 @@ export default function CadastrarTemaScreen() {
     }
   };
 
+  // Cancela o modo de edição
   const cancelarEdicao = () => {
     setEditandoId(null);
     setNomeEditado('');
