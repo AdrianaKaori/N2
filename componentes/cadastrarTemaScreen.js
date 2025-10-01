@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, TextInput, Alert, Text, TouchableOpacity, Image, FlatList, StyleSheet,} from 'react-native';
+import { View, TextInput, Alert, Text, TouchableOpacity, Image, FlatList, StyleSheet, } from 'react-native';
 
 import { getTemas, addTema, updateTema, deleteTema } from '../services/dbTemas';
 
@@ -41,13 +41,26 @@ export default function CadastrarTemaScreen() {
     }
   };
 
-  const removerElemento = async (id) => {
-    const sucesso = await deleteTema(id);
-    if (sucesso) {
-      Alert.alert('Sucesso', 'Tema removido');
-      carregarTemas();
+  function confirmaExclusão(id) {
+
+    Alert.alert("Aviso", "Deseja mesmo remover o tema?", [
+      { text: "Sim", onPress: () => removerElemento(id, true) },
+      { text: "Não", onPress: () => removerElemento(id, false) }
+    ]);
+
+  }
+
+  const removerElemento = async (id, isConfirmed) => {
+    if (isConfirmed) {
+      const sucesso = await deleteTema(id);
+      if (sucesso) {
+        Alert.alert('Sucesso', 'Tema removido');
+        carregarTemas();
+      } else {
+        Alert.alert('Erro', 'Erro ao remover tema');
+      }
     } else {
-      Alert.alert('Erro', 'Erro ao remover tema');
+      Alert.alert('Cancelado', 'Tema não removido');
     }
   };
 
@@ -56,20 +69,33 @@ export default function CadastrarTemaScreen() {
     setNomeEditado(nome);
   };
 
-  const salvarEdicao = async () => {
+  function confirmaEdicao() {
+
+    Alert.alert("Aviso", "Deseja mesmo editar o tema?", [
+      { text: "Sim", onPress: () => salvarEdicao(true) },
+      { text: "Não", onPress: () => salvarEdicao(false) }
+    ]);
+
+  }
+
+  const salvarEdicao = async (isConfirmed) => {
     if (!nomeEditado.trim()) {
       Alert.alert('Erro', 'Digite o nome do tema');
       return;
     }
 
-    const sucesso = await updateTema(editandoId, nomeEditado);
-    if (sucesso) {
-      Alert.alert('Sucesso', 'Tema atualizado');
-      setEditandoId(null);
-      setNomeEditado('');
-      carregarTemas();
+    if (isConfirmed) {
+      const sucesso = await updateTema(editandoId, nomeEditado);
+      if (sucesso) {
+        Alert.alert('Sucesso', 'Tema atualizado');
+        setEditandoId(null);
+        setNomeEditado('');
+        carregarTemas();
+      } else {
+        Alert.alert('Erro', 'Erro ao atualizar tema');
+      }
     } else {
-      Alert.alert('Erro', 'Erro ao atualizar tema');
+      Alert.alert('Cancelado', 'Tema não atualizado');
     }
   };
 
@@ -109,7 +135,7 @@ export default function CadastrarTemaScreen() {
                   placeholder="Editar nome"
                   placeholderTextColor="#555"
                 />
-                <TouchableOpacity onPress={salvarEdicao} style={styles.editBtn}>
+                <TouchableOpacity onPress={confirmaEdicao} style={styles.editBtn}>
                   <Text style={styles.editBtnText}>Salvar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={cancelarEdicao} style={[styles.editBtn, { backgroundColor: '#ccc' }]}>
@@ -122,7 +148,7 @@ export default function CadastrarTemaScreen() {
                 <TouchableOpacity onPress={() => iniciarEdicao(item.id, item.nome)}>
                   <Image source={iconEdit} style={styles.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => removerElemento(item.id)}>
+                <TouchableOpacity onPress={() => confirmaExclusão(item.id)}>
                   <Image source={iconDelete} style={styles.icon} />
                 </TouchableOpacity>
               </>

@@ -8,6 +8,7 @@ export default function IniciarQuizScreen({ navigation }) {
   const [temaSelecionado, setTemaSelecionado] = useState('');
   const [quantidade, setQuantidade] = useState('1');
   const [quantidadeDisponivel, setQuantidadeDisponivel] = useState(0);
+  const [tempoCronometrado, setTempoCronometrado] = useState(false);
 
   async function getTemasComQuantidadePerguntas() {
     const db = await getDbConnection();
@@ -75,6 +76,7 @@ export default function IniciarQuizScreen({ navigation }) {
     navigation.navigate('Quiz', {
       temaId: temaSelecionado,
       quantidade: qtd,
+      tempoJogo: tempoCronometrado,
     });
   };
 
@@ -113,6 +115,22 @@ export default function IniciarQuizScreen({ navigation }) {
           ) : (
             <Picker.Item label="Nenhuma pergunta disponível" value="0" />
           )}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>Tempo de jogo:</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={quantidade}
+          onValueChange={(itemValue) => setTempoCronometrado(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Selecione o tempo de jogo" value="" />
+          <Picker.Item label="Sem tempo" value="" />
+          <Picker.Item label="30 segundos" value="30" />
+          <Picker.Item label="1 minuto" value="60" />
+          <Picker.Item label="2 minutos" value="120" />
+          <Picker.Item label="3 minutos" value="180" />
         </Picker>
       </View>
 
