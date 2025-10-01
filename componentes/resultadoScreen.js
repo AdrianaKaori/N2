@@ -1,16 +1,19 @@
 import { View, Text, ScrollView, Button, StyleSheet } from 'react-native';
 
 export default function ResultadoScreen({ route, navigation }) {
+  // Desestrutura os parâmetros recebidos da navegação
+  // 'perguntas' é a lista de perguntas do quiz
+  // 'respostas' é a lista com as alternativas escolhidas pelo usuário
   const { perguntas = [], respostas = [] } = route.params || {};
 
   let acertos = 0;
-
+   // Percorre cada pergunta e compara a resposta correta com a escolhida
   perguntas.forEach((p, i) => {
     if (p.resposta_correta === respostas[i]) {
-      acertos++;
+      acertos++; // Se a resposta estiver correta, incrementa o contador de acertos
     }
   });
-
+  // Calcula o percentual de acertos com duas casas decimais
   const percentual = ((acertos / perguntas.length) * 100).toFixed(2);
 
   return (
